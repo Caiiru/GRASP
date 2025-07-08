@@ -17,7 +17,13 @@ export default class EventBus extends cc.Component implements IEventBus<IEvent> 
     private static _instance: EventBus = null;
     private _listeners: Map<string, IEventListener[]> = new Map();
 
-     
+    // singleton
+    public static get Instance(): EventBus {
+        if (!EventBus._instance) {
+            cc.error("EventBus instance does not exist. Please ensure it is initialized.");
+        }
+        return EventBus._instance;
+    }
     protected onLoad(): void {
         // only one instance of EventBus exists
         if (EventBus._instance) {
