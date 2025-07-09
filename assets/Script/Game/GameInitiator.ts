@@ -1,3 +1,4 @@
+import Timer from "../Auxliar/Timer";
 import { CommonEvents } from "../Event/CommonEvents";
 import EventBus from "../Event/EventBus";
 
@@ -17,7 +18,10 @@ export default class GameInitiator extends cc.Component {
     @property(cc.Prefab)
     public mainMenuPrefab: cc.Prefab = null;
     @property(cc.Prefab)
-    public eventBusPrefab:cc.Node = null;
+    public eventBusPrefab: cc.Node = null;
+
+    @property
+    private next: Timer = null;
 
     //#endregion
 
@@ -67,7 +71,8 @@ export default class GameInitiator extends cc.Component {
         this._progressBarNode.getComponentInChildren(cc.Label).string = "Loading...";
         this._progressBarNode.getComponentInChildren(cc.ProgressBar).progress = 0;
 
-
+        //Test
+        this.next = new Timer("Next", 5);
 
         await this.BindObjects();
 
@@ -105,9 +110,22 @@ export default class GameInitiator extends cc.Component {
         this._progressBarNode.destroy(); // Remove the loading canvas after initialization
         this._mainMenu.active = true;
 
+        this._eventBus.Subscribe("Timer", this.ShowTimerMensagem);
+
         await new Promise(resolve => setTimeout(resolve, 1000));
         this._eventBus.Notify({
             eventName: CommonEvents.GameFirstLoad,
             data: this});
     }
+
+    async update()
+    {
+        this._eventBus.Notify({eventName: "Timer", data: this});
+    }
+
+    public ShowTimerMensagem(timer: Timer) {
+        this.next = null;
+        console.log("Timer = " + timer.timerName);
+    }
+
 }
