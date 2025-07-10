@@ -4,6 +4,8 @@
     GameLoading = "GAME_LOADING",
     GameLoadingProgress = "GAME_LOADING_PROGRESS",
     GameLoadingComplete = "GAME_LOADING_COMPLETE",
+    UserLogin = "USER_LOGIN",
+    UserLogout = "USER_LOGOUT",
     GameStart = "GAME_START",
     GameEnd = "GAME_END",
  }
