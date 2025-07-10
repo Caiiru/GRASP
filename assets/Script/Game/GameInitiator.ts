@@ -80,10 +80,9 @@ export default class GameInitiator extends cc.Component {
         // Initialize the main menu
         await this._mainMenu.Initialize().then(() => {
             
-
             this._eventBus.Notify({
                 eventName: InitializeEvents.GameFirstLoad,
-                data: this
+                data: null
             });
         });
         // Notify that the game has been initialized
