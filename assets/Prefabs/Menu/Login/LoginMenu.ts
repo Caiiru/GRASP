@@ -5,10 +5,9 @@
 // Learn life-cycle callbacks:
 //  - https://docs.cocos.com/creator/2.4/manual/en/scripting/life-cycle-callbacks.html
 
-import { CommonEvents } from "../../../Script/Event/CommonEvents";
 import EventBus from "../../../Script/Event/EventBus";
+import { LoginEvents } from "../../../Script/Event/EventsEnums/LoginEvents";
 import { IEvent } from "../../../Script/Event/IEvent";
-import { UIEvents } from "../../../Script/Event/UIEvents";
 import Logger from "../../../Script/Utils/Logger";
 
 const { ccclass, property } = cc._decorator;
@@ -36,8 +35,8 @@ export default class LoginMenu extends cc.Component {
         this.bindObjects();
         this.bindClicks();
     }
-    bindObjects(){
-        
+    bindObjects() {
+
         this.logger = this.logger.getComponent(Logger);
 
         if (!this.logger) {
@@ -51,7 +50,7 @@ export default class LoginMenu extends cc.Component {
         }
     }
 
-    bindClicks(){
+    bindClicks() {
         this.loginButton.node.on('click',
             this.handleButtonClick(this.onLoginButtonClicked),
             this);
@@ -80,7 +79,10 @@ export default class LoginMenu extends cc.Component {
 
     onLoginButtonClicked() {
         //Handle login logic here
-        this.HandleLoginLogic();
+
+        this.TryToLogin();
+
+
 
 
     }
@@ -90,9 +92,31 @@ export default class LoginMenu extends cc.Component {
     onForgotPasswordButtonClicked() {
 
     }
+    /**
+     * TryToLogin
+     * This method is called when the user attempts to log in.
+     * It notifies the EventBus and handles the login logic.
+     */
+    async TryToLogin() {
+        EventBus.Instance.Notify({ eventName: LoginEvents.UserTryingToLogin, data: null });
+        const loginSuccess = await this.HandleLoginLogic();
 
+        if (loginSuccess) {
+            this.LogMessage("Login successful!");
+            EventBus.Instance.Notify({ eventName: LoginEvents.UserLoginSuccess, data: null });
+        } else {
+            this.LogMessage("Login failed. Please check your credentials.");
+            EventBus.Instance.Notify({ eventName: LoginEvents.UserLoginFailure, data: null });
+        }
+    }
+    /**
+     * HandleLoginLogic
+     * This method handles the login logic, such as validating the username and password.
+     * Returns true if login is successful, false otherwise.
+     */
     HandleLoginLogic():boolean {
-        
+
+
         const usernameInput = this.usernameInput.string;
         const passwordInput = this.passwordInput.string;
 
@@ -106,12 +130,10 @@ export default class LoginMenu extends cc.Component {
         return true;
     }
 
-    LogMessage(message:string){
-        if(!this.logger)return;
+    LogMessage(message: string) {
+        if (!this.logger) return;
 
 
-        this.logger.Log(message,this);
-    }
-
-    // update (dt) {}
+        this.logger.Log(message, this);
+    } 
 }

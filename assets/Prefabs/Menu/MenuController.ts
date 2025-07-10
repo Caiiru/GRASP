@@ -4,9 +4,10 @@
 //  - https://docs.cocos.com/creator/2.4/manual/en/scripting/reference/attributes.html
 // Learn life-cycle callbacks:
 //  - https://docs.cocos.com/creator/2.4/manual/en/scripting/life-cycle-callbacks.html
- 
-import EventBus from "../../Script/Event/EventBus"; 
+
+import EventBus from "../../Script/Event/EventBus";
 import { InitializeEvents } from "../../Script/Event/EventsEnums/InitializeEvents";
+import { LoginEvents } from "../../Script/Event/EventsEnums/LoginEvents";
 import Logger from "../../Script/Utils/Logger";
 import MenuLoadingBar from "./MainMenu/LoadingBar/MenuLoadingBar";
 
@@ -34,26 +35,39 @@ export default class MenuController extends cc.Component {
 
     async start() {
 
-        await (this.bindObjects());
-        this.changeState(MainMenuState.Loading);
-        await (this.bindEvents());
 
     }
+    /**
+     * Initialize the MainMenuController.
+     * This method binds all necessary objects and events, sets the initial state to Loading,
+     * and updates the loading bar progress.
+     * @returns {Promise<boolean>} - Returns true if initialization is successful.
+     */
 
-    onGameFirstLoad() {
+    public async Initialize(): Promise<boolean> {
+
+        await (this.BindObjects());
+        this.ChangeState(MainMenuState.Loading);
+        await (this.BindEvents());
+
+        this.SetLoadingBarProgress(1);
+        await new Promise(resolve => setTimeout(resolve, 1000));  
+        return true;
+    }
+    OnGameFirstLoad() {
         this.Log("Game first load event received. Changing state to Login.");
 
-        this.loadingScreen.getComponent(MenuLoadingBar).UpdateProgress(1);
-        this.changeState(MainMenuState.Login);
+        //this.loadingScreen.getComponent(MenuLoadingBar).UpdateProgress(1);
+        this.ChangeState(MainMenuState.Login);
     }
 
-    changeState(newState: MainMenuState) {
+    ChangeState(newState: MainMenuState) {
         if (this.CurrentState === newState) {
             this.Log("State is already " + MainMenuState[newState]);
             return;
         }
         this.CurrentState = newState;
-        this.handleCurrentState();
+        this.HandleCurrentState();
     }
 
     /*
@@ -62,19 +76,19 @@ export default class MenuController extends cc.Component {
         It ensures that only the relevant screen is active based on the current state.
         It also logs the current state for debugging purposes.
     */
-    handleCurrentState() {
-        this.desactivateAllScreens();
+    HandleCurrentState() {
+        this.DesactivateAllScreens();
 
         switch (this.CurrentState) {
             case MainMenuState.Loading:
-                this.loadingScreen.active = true; 
+                this.loadingScreen.active = true;
                 this.Log("Loading state");
                 break;
-            case MainMenuState.Login: 
-                this.loginScreen.active = true; 
+            case MainMenuState.Login:
+                this.loginScreen.active = true;
                 this.Log("Login state");
                 break;
-            case MainMenuState.Main: 
+            case MainMenuState.Main:
                 this.mainMenuScreen.active = true;
                 this.Log("Main Menu state");
                 break;
@@ -83,22 +97,12 @@ export default class MenuController extends cc.Component {
         }
     }
 
-    desactivateAllScreens() {
-        this.loadingScreen.active=false;
+    DesactivateAllScreens() {
+        this.loadingScreen.active = false;
         this.loginScreen.active = false;
         this.mainMenuScreen.active = false;
     }
-
-    async bindEvents() {
-
-        this._eventBus.Subscribe(InitializeEvents.GameFirstLoad, () => {
-            this.onGameFirstLoad();
-        }, this);
-
-        this.loadingScreen.getComponent(MenuLoadingBar).UpdateProgress(0.3);
-    }
-
-    async bindObjects() {
+    async BindObjects() {
 
         this.logger = this.logger.getComponent(Logger);
         this._eventBus = EventBus.Instance;
@@ -119,7 +123,40 @@ export default class MenuController extends cc.Component {
         }
 
     }
+    async BindEvents() {
 
+        this._eventBus.Subscribe(InitializeEvents.GameFirstLoad, () => {
+            this.OnGameFirstLoad();
+        }, this);
+
+        this.SetLoadingBarProgress(0.3);
+
+        await (this.BindLoginEvents());
+    }
+
+    async BindLoginEvents() {
+        this._eventBus.Subscribe(LoginEvents.UserLoginSuccess, () => {
+            this.Log("User logged in successfully. Changing state to Main Menu.");
+            this.ChangeState(MainMenuState.Main);
+        }, this);
+
+        this.SetLoadingBarProgress(0.6);
+
+    }
+
+    /**
+     * SetLoadingBarProgress
+     * This method is used to update the loading bar progress.
+     * It notifies the EventBus with the new progress value.
+     * @param value as number - The new progress value, should be between 0 and 1.
+     */
+    SetLoadingBarProgress(value: number) {
+
+        this._eventBus.Notify({
+            eventName: InitializeEvents.GameLoadingProgress,
+            data: value as number
+        });
+    }
 
     Log(message: string) {
         if (!this.logger) return;

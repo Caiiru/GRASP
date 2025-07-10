@@ -33,8 +33,7 @@ export default class EventBus extends cc.Component implements IEventBus<IEvent> 
             EventBus._instance = this;
             cc.game.addPersistRootNode(this.node);
         }
-
-        console.log("EventBus initialized");
+  
     } 
     protected onDestroy(): void {
         if (EventBus._instance === this) {
