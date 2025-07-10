@@ -40,6 +40,7 @@ Para testar as funcionalidades implementadas nesta branch, siga os passos abaixo
 
 Aqui estão alguns dos próximos passos e itens a serem desenvolvidos e/ou revisados nesta branch:
 * [ ] Entidade Player 
+* [ ] Iniciar integração com o **PlayroomKit** -> insertCoin
 * [ ] Lógica para o fluxo de perguntas e respostas.
 * [ ] Implementação da criação de quizzes.
 * [ ] Desenvolvimento da funcionalidade de entrada em quizzes existentes.
