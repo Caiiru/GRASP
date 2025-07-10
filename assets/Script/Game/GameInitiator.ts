@@ -1,5 +1,6 @@
-import { CommonEvents } from "../Event/CommonEvents";
-import EventBus from "../Event/EventBus";
+
+import EventBus from "../Event/EventBus"; 
+import { InitializeEvents } from "../Event/EventsEnums/InitializeEvents";
 
  const { ccclass, property } = cc._decorator;
 
@@ -80,7 +81,7 @@ export default class GameInitiator extends cc.Component {
 
         await new Promise(resolve => setTimeout(resolve, 3000));
         this._eventBus.Notify({
-            eventName: CommonEvents.GameFirstLoad,
+            eventName: InitializeEvents.GameFirstLoad,
             data: this});
     }
 }

@@ -4,10 +4,11 @@
 //  - https://docs.cocos.com/creator/2.4/manual/en/scripting/reference/attributes.html
 // Learn life-cycle callbacks:
 //  - https://docs.cocos.com/creator/2.4/manual/en/scripting/life-cycle-callbacks.html
-
-import { CommonEvents } from "../../Script/Event/CommonEvents";
-import EventBus from "../../Script/Event/EventBus";
+ 
+import EventBus from "../../Script/Event/EventBus"; 
+import { InitializeEvents } from "../../Script/Event/EventsEnums/InitializeEvents";
 import Logger from "../../Script/Utils/Logger";
+import MenuLoadingBar from "./MainMenu/LoadingBar/MenuLoadingBar";
 
 const { ccclass, property } = cc._decorator;
 
@@ -41,6 +42,8 @@ export default class MenuController extends cc.Component {
 
     onGameFirstLoad() {
         this.Log("Game first load event received. Changing state to Login.");
+
+        this.loadingScreen.getComponent(MenuLoadingBar).UpdateProgress(1);
         this.changeState(MainMenuState.Login);
     }
 
@@ -52,7 +55,7 @@ export default class MenuController extends cc.Component {
         this.CurrentState = newState;
         this.handleCurrentState();
     }
-    
+
     /*
         Desactive all screens and activate the current state screen.
         This method is called whenever the state changes.
@@ -88,15 +91,19 @@ export default class MenuController extends cc.Component {
 
     async bindEvents() {
 
-        this._eventBus.Subscribe(CommonEvents.GameFirstLoad, () => {
+        this._eventBus.Subscribe(InitializeEvents.GameFirstLoad, () => {
             this.onGameFirstLoad();
         }, this);
+
+        this.loadingScreen.getComponent(MenuLoadingBar).UpdateProgress(0.3);
     }
 
     async bindObjects() {
 
         this.logger = this.logger.getComponent(Logger);
         this._eventBus = EventBus.Instance;
+        this.loadingScreen.getComponent(MenuLoadingBar).Initialize();
+
 
         if (!this.logger) {
             cc.error("MainMenu: Logger is not assigned. Please assign a Logger instance to the logger property.");
@@ -110,6 +117,7 @@ export default class MenuController extends cc.Component {
             this.Log("EventBus instance is not initialized. Please ensure it is created before using it.");
             return;
         }
+
     }
 
 
