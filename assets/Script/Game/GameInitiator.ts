@@ -9,9 +9,7 @@ export default class GameInitiator extends cc.Component {
     
     //#region "Properties"
     @property(cc.Prefab)
-    public ui_RootPrefab: cc.Node = null;
-    @property(cc.Prefab)
-    public ui_splashScreenPrefab: cc.Prefab = null;
+    public ui_RootPrefab: cc.Node = null; 
     @property(cc.Prefab)
     public ui_loadingCanvasPrefab: cc.Prefab = null; 
     @property(cc.Prefab)
@@ -37,35 +35,6 @@ export default class GameInitiator extends cc.Component {
 
     async start() {
         //create instance of EventBus
-        const eventBusNode = cc.instantiate(this.eventBusPrefab);
-        eventBusNode.name = "EventBus";
-        eventBusNode.parent = cc.find("GameRoot");
-        this._eventBus = eventBusNode.getComponent("EventBus");
-
-        
-
-
-        // Initialize the game root node
-        this._rootCanvas = cc.instantiate(this.ui_RootPrefab);
-        this._rootCanvas.name = "CanvasRoot"; 
-        this._rootCanvas.parent = cc.find("GameRoot");
-        this._rootCanvas.setPosition(cc.v2(480, 320)); 
-        
-        // Initialize the splash screen
-         
-        const splashScreen = cc.instantiate(this.ui_splashScreenPrefab);
-        splashScreen.name = "SplashScreen";
-        splashScreen.parent = this._rootCanvas;
-        splashScreen.setPosition(cc.v2(0, 0)); 
-
-
-        // Initialize the loading canvas with a progress bar
-        this._progressBarNode = cc.instantiate(this.ui_loadingCanvasPrefab);
-        this._progressBarNode.name = "LoadingCanvas";
-        this._progressBarNode.parent = this._rootCanvas;
-        this._progressBarNode.setPosition(cc.v2(0, -120)); 
-        this._progressBarNode.getComponentInChildren(cc.Label).string = "Loading...";
-        this._progressBarNode.getComponentInChildren(cc.ProgressBar).progress = 0;
 
 
 
@@ -80,12 +49,21 @@ export default class GameInitiator extends cc.Component {
 
         //wait 2 seconds to simulate loading time 
         // await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        const eventBusNode = cc.instantiate(this.eventBusPrefab);
+        eventBusNode.name = "EventBus";
+        eventBusNode.parent = cc.find("GameRoot");
+        this._eventBus = eventBusNode.getComponent("EventBus");
 
-        this._progressBarNode.getComponentInChildren(cc.ProgressBar).progress = 0.3;
         
-        
-        this._progressBarNode.getComponentInChildren(cc.ProgressBar).progress = 0.6;
-        // await new Promise(resolve => setTimeout(resolve, 2000));
+
+
+        // Initialize the game root node
+        this._rootCanvas = cc.instantiate(this.ui_RootPrefab);
+        this._rootCanvas.name = "CanvasRoot"; 
+        this._rootCanvas.parent = cc.find("GameRoot");
+        this._rootCanvas.setPosition(cc.v2(480, 320)); 
+          
 
     } 
 
@@ -96,16 +74,11 @@ export default class GameInitiator extends cc.Component {
         this._mainMenu = cc.instantiate(this.mainMenuPrefab);
         this._mainMenu.name = "MainMenu";
         this._mainMenu.parent = this._rootCanvas;
-        this._mainMenu.setPosition(cc.v2(0, -120));
-        this._mainMenu.active = false;
-        
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        this._progressBarNode.getComponentInChildren(cc.ProgressBar).progress = 1;
-        console.log("Game Initialized");  
-        this._progressBarNode.destroy(); // Remove the loading canvas after initialization
+        this._mainMenu.setPosition(cc.v2(0, 0));
         this._mainMenu.active = true;
+         
 
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 3000));
         this._eventBus.Notify({
             eventName: CommonEvents.GameFirstLoad,
             data: this});

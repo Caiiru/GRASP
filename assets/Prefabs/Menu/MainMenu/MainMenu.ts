@@ -13,7 +13,7 @@ import Logger from "../../../Script/Utils/Logger";
 const {ccclass, property} = cc._decorator;
 
 @ccclass
-export default class NewClass extends cc.Component {
+export default class MainMenu extends cc.Component {
 
     // Logger para mensagens de debug
     @property(cc.Node)
@@ -36,6 +36,8 @@ export default class NewClass extends cc.Component {
      * Inicializa o menu principal e verifica se o logger está atribuído.
      */
     onLoad () {
+        this.logger = this.logger.getComponent(Logger);
+        
         if(!this.logger){
             cc.error("MainMenu: Logger is not assigned.");
             return;
@@ -66,6 +68,7 @@ export default class NewClass extends cc.Component {
         this.JoinButton.node.on('click', this.createButtonClicked(this.onJoinButtonClicked), this);
         this.CreateButton.node.on('click', this.createButtonClicked(this.onCreateButtonClicked), this);
         this.EditProfileButton.node.on('click', this.createButtonClicked(this.onEditProfileButtonClicked), this);
+        this.testBind();
     } 
 
     /**
@@ -106,8 +109,20 @@ export default class NewClass extends cc.Component {
      * Handler para o clique no botão Edit Profile.
      */
     onEditProfileButtonClicked(){ 
-        
+
     }
 
     // update (dt) {}
+
+
+    testBind(){
+        EventBus.Instance.Subscribe("UI_BUTTON_CLICK", this.LogMessage, this); 
+    }
+     
+
+    LogMessage(message:string){
+        if(!this.logger) return;
+
+        this.logger.Log(message,this);
+    }
 }

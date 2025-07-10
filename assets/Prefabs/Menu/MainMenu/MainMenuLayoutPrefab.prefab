@@ -2859,6 +2859,21 @@
     "logger": {
       "__id__": 70
     },
+    "HostButton": {
+      "__id__": 43
+    },
+    "JoinButton": {
+      "__id__": 53
+    },
+    "CreateButton": {
+      "__id__": 63
+    },
+    "EditProfileButton": {
+      "__id__": 16
+    },
+    "UsernameLabel": {
+      "__id__": 26
+    },
     "_id": ""
   },
   {

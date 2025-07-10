@@ -11,7 +11,7 @@ export default class Logger extends cc.Component {
   
     Log(message: string, sender: object): void {
         if (!this.showLog) return;
-        console.log(message, sender);
-        cc.log(message, sender);
+        console.log( `${sender.constructor.name}:`,message); 
+        cc.log( `${sender.constructor.name}:`,message); 
     }
 }

@@ -7,84 +7,124 @@
 
 import { CommonEvents } from "../../Script/Event/CommonEvents";
 import EventBus from "../../Script/Event/EventBus";
+import Logger from "../../Script/Utils/Logger";
 
 const { ccclass, property } = cc._decorator;
 
 @ccclass
 export default class MenuController extends cc.Component {
 
-    private _eventBus: EventBus = null; 
-
-    @property(cc.Node)
-    loginScreen: cc.Node = null;   
-    @property(cc.Node)
-    mainMenuScreen:cc.Node = null;
+    private _eventBus: EventBus = null;
 
     @property
-    CurrentState: MainMenuState = MainMenuState.None;
- 
-    async start() { 
-        await(this.bindObjects());
+    CurrentState: MainMenuState = null
 
+    @property(cc.Node)
+    loadingScreen: cc.Node = null;
+
+    @property(cc.Node)
+    loginScreen: cc.Node = null;
+    @property(cc.Node)
+    mainMenuScreen: cc.Node = null;
+
+
+    @property(cc.Node)
+    logger: Logger = null;
+
+    async start() {
+
+        await (this.bindObjects());
         this.changeState(MainMenuState.Loading);
-        this._eventBus = EventBus.Instance;
-        if (!this._eventBus) {
-            cc.error("EventBus instance is not initialized. Please ensure it is created before using it.");
-            return;
-        }
-        this._eventBus.Subscribe(CommonEvents.GameFirstLoad, this.onGameFirstLoad, this);
+        await (this.bindEvents());
 
     }
 
-    onGameFirstLoad(){
+    onGameFirstLoad() {
+        this.Log("Game first load event received. Changing state to Login.");
         this.changeState(MainMenuState.Login);
     }
 
     changeState(newState: MainMenuState) {
         if (this.CurrentState === newState) {
-            cc.log("State is already " + MainMenuState[newState]);
+            this.Log("State is already " + MainMenuState[newState]);
             return;
-        }       
+        }
         this.CurrentState = newState;
         this.handleCurrentState();
     }
+    
+    /*
+        Desactive all screens and activate the current state screen.
+        This method is called whenever the state changes.
+        It ensures that only the relevant screen is active based on the current state.
+        It also logs the current state for debugging purposes.
+    */
+    handleCurrentState() {
+        this.desactivateAllScreens();
 
-    handleCurrentState(){
         switch (this.CurrentState) {
             case MainMenuState.Loading:
-                this.loginScreen.active = false;
-                this.mainMenuScreen.active = false;
-                cc.log("Loading state");
+                this.loadingScreen.active = true; 
+                this.Log("Loading state");
                 break;
-            case MainMenuState.Login:
-                this.loginScreen.active = true;
-                this.mainMenuScreen.active = false;
-                cc.log("Login state");
+            case MainMenuState.Login: 
+                this.loginScreen.active = true; 
+                this.Log("Login state");
                 break;
-            case MainMenuState.Main:
-                this.loginScreen.active = false;
+            case MainMenuState.Main: 
                 this.mainMenuScreen.active = true;
-                cc.log("Main Menu state");
+                this.Log("Main Menu state");
                 break;
             default:
-                cc.error("Unhandled state: " + MainMenuState[this.CurrentState]);
+                this.Log("Unhandled state: " + MainMenuState[this.CurrentState]);
         }
     }
 
-    async bindObjects(){
-        if(this.loginScreen == null || this.mainMenuScreen == null){
+    desactivateAllScreens() {
+        this.loadingScreen.active=false;
+        this.loginScreen.active = false;
+        this.mainMenuScreen.active = false;
+    }
+
+    async bindEvents() {
+
+        this._eventBus.Subscribe(CommonEvents.GameFirstLoad, () => {
+            this.onGameFirstLoad();
+        }, this);
+    }
+
+    async bindObjects() {
+
+        this.logger = this.logger.getComponent(Logger);
+        this._eventBus = EventBus.Instance;
+
+        if (!this.logger) {
+            cc.error("MainMenu: Logger is not assigned. Please assign a Logger instance to the logger property.");
+            return;
+        }
+        if (this.loginScreen == null || this.mainMenuScreen == null || this.loadingScreen == null) {
             cc.error("MainMenu: bindObjects - One or more UI components are not assigned in the MainMenu script.");
             return;
         }
+        if (!this._eventBus) {
+            this.Log("EventBus instance is not initialized. Please ensure it is created before using it.");
+            return;
+        }
+    }
+
+
+    Log(message: string) {
+        if (!this.logger) return;
+        this.logger.Log(message, this);
+
     }
 }
 
-enum MainMenuState{
-    None = 0,
-    Loading = 1, 
+enum MainMenuState {
+    Loading = 1,
     Login = 2,
     Register = 3,
     Main = 4,
     Game = 5,
-    Create=6,
+    Create = 6,
 }

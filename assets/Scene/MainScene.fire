@@ -133,9 +133,6 @@
     "ui_RootPrefab": {
       "__uuid__": "c515d9ea-2381-4822-9905-e36564543ea0"
     },
-    "ui_splashScreenPrefab": {
-      "__uuid__": "30fca600-60a1-4ca1-9ccf-49f6081fb491"
-    },
     "ui_loadingCanvasPrefab": {
       "__uuid__": "ba308733-560b-48b0-810f-bd898b0e2b1c"
     },

@@ -2721,7 +2721,7 @@
     "forgotPasswordButton": {
       "__id__": 54
     },
-    "Logger": {
+    "logger": {
       "__id__": 68
     },
     "_id": ""
